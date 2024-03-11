@@ -141,4 +141,7 @@ Route::namespace('Api')->name('api.')->group(function () {
     Route::namespace('Account')->group(function () {
         Route::post('add/account', 'AccountController@addAccount');
     });
+    Route::namespace('Order')->group(function () {
+        Route::post('add/order', 'OrderController@addOrder');
+    });
 });
