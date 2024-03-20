@@ -31,6 +31,7 @@ class ShopController extends Controller
         $shop->seller_id = $request->seller_id;
         $shop->shop_name = $request->shop_name;
         $shop->shop_address = $request->shop_address;
+        $shop->shop_phone = $request->shop_phone;
         $shop->save();
         $shop->shop_id = getNumber() . $shop->id;
         $shop->save();
@@ -41,19 +42,16 @@ class ShopController extends Controller
             'remark' => 'Add Shop',
             'status' => 'ok',
             'message' => ['success' => $notify],
+            'Shop ID' => $shop->shop_id
         ]);
     }
 
-    public function viewShop()
+    public function viewShop($sellerId)
     {
-        $shops = Shop::paginate(getPaginate());
+        $shops = Shop::where('seller_id',$sellerId)->get();
 
-        $notify[] = 'Shop List';
         return response()->json([
-            'product' => $shops,
-            'remark' => 'View Shop',
-            'status' => 'ok',
-            'message' => ['success' => $notify],
+            'shop' => $shops
         ], 200);
     }
 }

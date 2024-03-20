@@ -41,14 +41,10 @@ class ProductController extends Controller
 
     public function viewProduct()
     {
-        $products = Product::paginate(getPaginate());
+        $products = Product::all();
 
-        $notify[] = 'Product List';
         return response()->json([
-            'product' => $products,
-            'remark' => 'View Product',
-            'status' => 'ok',
-            'message' => ['success' => $notify],
+            'product' => $products
         ], 200);
     }
 }
