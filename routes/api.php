@@ -143,5 +143,8 @@ Route::namespace('Api')->name('api.')->group(function () {
     });
     Route::namespace('Order')->group(function () {
         Route::post('add/order', 'OrderController@addOrder');
+        Route::get('view/order/{sellerId}', 'OrderController@viewOrder');
+        Route::get('view/shop/order/dealer/{dealerId}', 'OrderController@viewOrderWithShopForDealer');
+        Route::get('view/seller/order/dealer/{dealerId}', 'OrderController@viewOrderWithSellerForDealer');
     });
 });
