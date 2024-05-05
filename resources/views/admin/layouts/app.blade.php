@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,8 +15,10 @@
     <!-- Custom fonts for this template-->
     @include('admin.include.css')
     <link rel="stylesheet" href="{{asset('assets/admin/css/vendor/select2.min.css')}}">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
 </head>
+
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -30,14 +31,14 @@
 
             <!-- Main Content -->
             <div id="content">
-            @include('partials.notify')
+                @include('partials.notify')
                 @include('admin.include.topbar')
                 @include('admin.partials.breadcrumb')
                 @yield('content')
-            @include('admin.include.footer')
-            <!-- End of Footer -->
+                @include('admin.include.footer')
+                <!-- End of Footer -->
             </div>
-        <!-- End of Main Content -->
+            <!-- End of Main Content -->
         </div>
         <!-- End of Content Wrapper -->
 
@@ -48,10 +49,9 @@
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
-    @include('admin.include.js') 
+    @include('admin.include.js')
     @stack('script-lib')
     @stack('script')
 </body>
 
-</html> 
-
+</html>

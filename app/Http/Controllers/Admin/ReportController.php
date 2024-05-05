@@ -3,47 +3,65 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\NotificationLog;
-use App\Models\Transaction;
-use App\Models\UserLogin;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Constants\Status;
 
 class ReportController extends Controller
 {
-    public function transaction(Request $request)
+    public function index()
     {
-        $pageTitle = 'Transaction Logs';
-
-        $remarks = Transaction::distinct('remark')->orderBy('remark')->get('remark');
-
-        $transactions = Transaction::searchable(['trx','user:username'])->filter(['trx_type','remark'])->dateFilter()->orderBy('id','desc')->with('user')->paginate(getPaginate());
-
-        return view('admin.reports.transactions', compact('pageTitle', 'transactions','remarks'));
+        $pageTitle = "Seller List";
+        $report = User::where('account_type', Status::SELLER)->get();
+        return view('admin.report.index', compact('pageTitle', 'report'));
     }
 
-    public function loginHistory(Request $request)
+    public function sellerReport($id)
     {
-        $pageTitle = 'User Login History';
-        $loginLogs = UserLogin::orderBy('id','desc')->searchable(['user:username'])->with('user')->paginate(getPaginate());
-        return view('admin.reports.logins', compact('pageTitle', 'loginLogs'));
-    }
+        $pageTitle = "Seller order Details";
+        $currentDayPrice = User::find($id)
+            ->orders()
+            ->whereDate('created_at', today())
+            ->sum('price');
 
-    public function loginIpHistory($ip)
-    {
-        $pageTitle = 'Login by - ' . $ip;
-        $loginLogs = UserLogin::where('user_ip',$ip)->orderBy('id','desc')->with('user')->paginate(getPaginate());
-        return view('admin.reports.logins', compact('pageTitle', 'loginLogs','ip'));
-    }
+        $currentDayOrders = User::find($id)
+            ->orders()
+            ->whereDate('created_at', today())
+            ->count();
 
-    public function notificationHistory(Request $request){
-        $pageTitle = 'Notification History';
-        $logs = NotificationLog::orderBy('id','desc')->searchable(['user:username'])->with('user')->paginate(getPaginate());
-        return view('admin.reports.notification_history', compact('pageTitle','logs'));
-    }
+        // Total price and total orders for the current month
+        $currentMonthPrice = User::find($id)
+            ->orders()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->sum('price');
 
-    public function emailDetails($id){
-        $pageTitle = 'Email Details';
-        $email = NotificationLog::findOrFail($id);
-        return view('admin.reports.email_details', compact('pageTitle','email'));
+        $currentMonthOrders = User::find($id)
+            ->orders()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+
+        // Total price and total orders for the current year
+        $currentYearPrice = User::find($id)
+            ->orders()
+            ->whereYear('created_at', now()->year)
+            ->sum('price');
+
+        $currentYearOrders = User::find($id)
+            ->orders()
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // Pass the variables to the view
+        return view('admin.report.view', compact(
+            'currentDayPrice',
+            'currentDayOrders',
+            'currentMonthPrice',
+            'currentMonthOrders',
+            'currentYearPrice',
+            'currentYearOrders'
+        ));
     }
 }

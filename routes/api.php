@@ -133,18 +133,23 @@ Route::namespace('Api')->name('api.')->group(function () {
     Route::namespace('Product')->group(function () {
         Route::post('add/product', 'ProductController@addProduct');
         Route::get('view/product', 'ProductController@viewProduct');
+        Route::get('search/product', 'ProductController@productSearch');
     });
     Route::namespace('Shop')->group(function () {
         Route::post('add/shop', 'ShopController@addShop');
-        Route::get('view/shop', 'ShopController@viewShop');
+        Route::get('view/shop/{sellerId}', 'ShopController@viewShop');
+        Route::get('search/shop', 'ShopController@shopSearch');
     });
     Route::namespace('Account')->group(function () {
         Route::post('add/account', 'AccountController@addAccount');
     });
     Route::namespace('Order')->group(function () {
         Route::post('add/order', 'OrderController@addOrder');
+        Route::post('edit/order/{id}', 'OrderController@orderEdit');
         Route::get('view/order/{sellerId}', 'OrderController@viewOrder');
         Route::get('view/shop/order/dealer/{dealerId}', 'OrderController@viewOrderWithShopForDealer');
         Route::get('view/seller/order/dealer/{dealerId}', 'OrderController@viewOrderWithSellerForDealer');
+        Route::get('view/dealer/order/ram/{ramId}', 'OrderController@viewOrderWithDealerForRam');
+        Route::get('view/seller/order/ram/{ramId}', 'OrderController@viewOrderWithSellerForRam');
     });
 });

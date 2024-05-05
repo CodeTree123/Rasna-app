@@ -54,4 +54,17 @@ class ShopController extends Controller
             'shop' => $shops
         ], 200);
     }
+    public function shopSearch(Request $request)
+    {
+        $query = $request->input('query');
+
+        $results = Shop::select('shops.id', 'shops.shop_id', 'shops.shop_phone','shops.shop_address','shops.shop_name')
+            ->where('shops.shop_phone', 'like', '%' . $query . '%')
+            ->orWhere('shops.shop_id', 'like', '%' . $query . '%')
+            ->orWhere('shops.shop_name', 'like', '%' . $query . '%')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['results' => $results], 200);
+    }
 }

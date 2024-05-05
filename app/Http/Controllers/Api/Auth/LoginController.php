@@ -162,12 +162,21 @@ class LoginController extends Controller
             'mobile' => 'required|string',
             'password' => 'required|string',
         ]);
+    
         $credentials = $request->only('mobile', 'password');
-
+    
         if (Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Login successful'], 200);
+            $user = Auth::user();
+            if ($user->account_type == 3) {
+                return response()->json(['message' => 'Login successful with Seller account', 'user' => $user], 200);
+            } elseif ($user->account_type == 2) {
+                return response()->json(['message' => 'Login successful with Dealer account', 'user' => $user], 200);
+            } elseif ($user->account_type == 1) {
+                return response()->json(['message' => 'Login successful with Ram account', 'user' => $user], 200);
+            }
         } else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
     }
+
 }
