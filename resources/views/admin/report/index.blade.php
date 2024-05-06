@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-around">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-secondary text-white">
                     <h3>Seller Order Report</h3>
@@ -20,7 +20,7 @@
                             @foreach($report as $w)
                             <tr>
                                 <td>{{$w->mobile}}</td>
-                                <td><a href="{{url('admin/report/price/report')}}/{{$w->id}}/{{$startDate ?? ''}}/{{$endDate ?? ''}}" class="btn btn-primary">View</a>
+                                <td><a href="{{url('admin/report/price/report')}}/{{$w->id}}" class="btn btn-primary">View</a>
                                 </td>
                             </tr>
                             @endforeach
