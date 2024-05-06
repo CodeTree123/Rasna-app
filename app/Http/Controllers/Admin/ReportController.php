@@ -17,9 +17,25 @@ class ReportController extends Controller
         return view('admin.report.index', compact('pageTitle', 'report'));
     }
 
-    public function sellerReport($id)
+    public function sellerReport(Request $request, $id)
     {
-        $pageTitle = "Seller order Details";
+        $pageTitle = "Seller Order Details";
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $id = $id;
+
+        // Calculate total price and total orders for the custom date range
+        $customDatePrice = User::find($id)
+            ->orders()
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('price');
+
+        $customDateOrders = User::find($id)
+            ->orders()
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        // Calculate total price and total orders for the current day
         $currentDayPrice = User::find($id)
             ->orders()
             ->whereDate('created_at', today())
@@ -30,7 +46,7 @@ class ReportController extends Controller
             ->whereDate('created_at', today())
             ->count();
 
-        // Total price and total orders for the current month
+        // Calculate total price and total orders for the current month
         $currentMonthPrice = User::find($id)
             ->orders()
             ->whereYear('created_at', now()->year)
@@ -43,7 +59,7 @@ class ReportController extends Controller
             ->whereMonth('created_at', now()->month)
             ->count();
 
-        // Total price and total orders for the current year
+        // Calculate total price and total orders for the current year
         $currentYearPrice = User::find($id)
             ->orders()
             ->whereYear('created_at', now()->year)
@@ -56,12 +72,16 @@ class ReportController extends Controller
 
         // Pass the variables to the view
         return view('admin.report.view', compact(
+            'pageTitle',
+            'customDatePrice',
+            'customDateOrders',
             'currentDayPrice',
             'currentDayOrders',
             'currentMonthPrice',
             'currentMonthOrders',
             'currentYearPrice',
-            'currentYearOrders'
+            'currentYearOrders',
+            'id'
         ));
     }
 }

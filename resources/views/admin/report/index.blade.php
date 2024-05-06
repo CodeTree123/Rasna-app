@@ -20,7 +20,8 @@
                             @foreach($report as $w)
                             <tr>
                                 <td>{{$w->mobile}}</td>
-                                <td><a href="{{url('admin/report/price/report')}}/{{$w->id}}" class="btn btn-primary">View</a></td>
+                                <td><a href="{{url('admin/report/price/report')}}/{{$w->id}}/{{$startDate ?? ''}}/{{$endDate ?? ''}}" class="btn btn-primary">View</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
