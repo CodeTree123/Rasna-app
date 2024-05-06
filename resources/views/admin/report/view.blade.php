@@ -28,7 +28,7 @@
                 </div>
                 <div class="card-body bg-dark text-white">
                     <p>Total Amount: {{ $customDatePrice}}</p>
-                    <p>Total Orders: {{ $customDateOrders }}</p>
+                    <p>Total Orders: {{ $customDateOrders }} BDT.</p>
                 </div>
             </div>
         </div>
