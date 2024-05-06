@@ -26,9 +26,25 @@
                         </tbody>
                     </table>
                 </div>
+                @if ($report->hasPages())
+                <div class="card-footer py-4">
+                    <p class="text-italic">Click below to see next page</p> @php echo paginateLinks($report) @endphp
+                </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
-
 @endsection
+@push('breadcrumb-plugins')
+<div class="container mt-2">
+    <div class="row align-items-center">
+        <div class="col">
+            <p class="text-success" style="font-size: 20px;">Search by Mobile Number :</p>
+        </div>
+        <div class="col">
+            <x-search-form dateSearch="no" />
+        </div>
+    </div>
+</div>
+@endpush

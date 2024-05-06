@@ -48,12 +48,12 @@
             </li>
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <!-- <div class="sidebar-heading">
                 User
-            </div>
+            </div> -->
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link collapsed " href="javascript:void(0)" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-user"></i>
                     <span>Manage User</span>
@@ -88,7 +88,7 @@
                         <a class="collapse-item" href="{{route('admin.users.notification.all')}}"><i class="menu-icon fa fa-dot-circle">Notification to all</i></a>
                     </div>
                 </div>
-            </li>
+            </li> -->
 
             <div class="sidebar-heading">
                 Report

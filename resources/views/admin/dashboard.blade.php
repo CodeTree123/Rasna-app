@@ -3,14 +3,7 @@
 @if(Session::has('message'))
 <p class="alert alert-info">{{Session::get('message')}}</p>
 @endif
-@php
-use App\Models\User;
-use App\Models\Order;
-$ram = User::where('account_type', Status::RAM)->count();
-$seller = User::where('account_type', Status::SELLER)->count();
-$dealer = User::where('account_type', Status::DEALER)->count();
-$order = Order::all()->count();
-@endphp
+
 <!-- Begin Page Content -->
 <div class="container-fluid">
 

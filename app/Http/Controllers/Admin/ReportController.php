@@ -13,7 +13,7 @@ class ReportController extends Controller
     public function index()
     {
         $pageTitle = "Seller List";
-        $report = User::where('account_type', Status::SELLER)->get();
+        $report = User::where('account_type', Status::SELLER)->searchable(['mobile'])->orderBy('id', 'desc')->paginate(getPaginate());
         return view('admin.report.index', compact('pageTitle', 'report'));
     }
 
