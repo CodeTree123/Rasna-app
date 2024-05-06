@@ -151,5 +151,6 @@ Route::namespace('Api')->name('api.')->group(function () {
         Route::get('view/seller/order/dealer/{dealerId}', 'OrderController@viewOrderWithSellerForDealer');
         Route::get('view/dealer/order/ram/{ramId}', 'OrderController@viewOrderWithDealerForRam');
         Route::get('view/seller/order/ram/{ramId}', 'OrderController@viewOrderWithSellerForRam');
+
     });
 });
