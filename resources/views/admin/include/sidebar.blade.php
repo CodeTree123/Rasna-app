@@ -1,5 +1,5 @@
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-warning sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('admin.dashboard')}}">
@@ -94,9 +94,16 @@
                 Report
             </div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('admin.report.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.report.index.seller') }}">
                     <i class="fas fa-download fa-sm text-white-50"></i>
-                    <span>@lang('See Report')</span>
+                    <span>@lang('Seller Report')</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.report.index.dealer') }}">
+                    <i class="fas fa-download fa-sm text-white-50"></i>
+                    <span>@lang('Dealer Report')</span>
                 </a>
             </li>
 

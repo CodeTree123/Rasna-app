@@ -6,22 +6,32 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-secondary text-white">
-                    <h3>Seller Order Report</h3>
+                    <h3>{{$pageTitle}}</h3>
                 </div>
                 <div class="card-body">
                     <table class="table">
                         <thead>
                             <tr>
+                                @if($pageTitle == 'Seller List')
                                 <th scope="col">Seller</th>
+                                @else
+                                <th scope="col">Dealer</th>
+                                @endif
                                 <th scope="col">Report</th>
                             </tr>
                         </thead>
                         <tbody>
+
                             @foreach($report as $w)
                             <tr>
                                 <td>{{$w->mobile}}</td>
-                                <td><a href="{{url('admin/report/price/report')}}/{{$w->id}}" class="btn btn-primary">View</a>
+                                @if($pageTitle == 'Seller List')
+                                <td><a href="{{url('admin/report/price/report/seller')}}/{{$w->id}}" class="btn btn-primary">View</a>
                                 </td>
+                                @else
+                                <td><a href="{{url('admin/report/price/report/dealer')}}/{{$w->id}}" class="btn btn-primary">View</a>
+                                </td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>

@@ -149,8 +149,10 @@ Route::middleware('admin')->group(function () {
 
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
-        Route::get('index', 'index')->name('index');
-        Route::get('price/report/{id}', 'sellerReport')->name('price');
+        Route::get('index/seller', 'indexSeller')->name('index.seller');
+        Route::get('index/dealer', 'indexDealer')->name('index.dealer');
+        Route::get('price/report/seller/{id}', 'sellerReport')->name('price.seller');
+        Route::get('price/report/dealer/{id}', 'dealerReport')->name('price.dealer');
     });
 
     Route::controller('GeneralSettingController')->group(function () {
