@@ -60,7 +60,7 @@
                     return {
                         results: $.map(data, function(item) {
                             return {
-                                text: item.mobile,
+                                text: item.mobile + " " + item.username,
                                 id: item.id
                             }
                         })

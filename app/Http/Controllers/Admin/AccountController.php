@@ -66,7 +66,7 @@ class AccountController extends Controller
     public function fetchUserData(Request $request)
     {
         $searchTerm = $request->input('q');
-        $data = User::where('mobile', 'like', '%' . $searchTerm . '%')->limit(5)->get();
+        $data = User::whereIn('account_type', [1, 2])->where('mobile', 'like', '%' . $searchTerm . '%')->limit(5)->get();
         return response()->json($data);
     }
 
