@@ -166,140 +166,205 @@ class OrderController extends Controller
     public function viewOrderWithSellerForDealer(Request $request, $dealerId)
     {
         $date = $request->date;
-
-        $orders = Order::with(['product', 'shop', 'seller'])
+    
+        $orders = Order::with(['product', 'seller'])
             ->where('dealer_id', $dealerId)
             ->whereDate('created_at', $date)
             ->where('status', 0)
             ->get();
-
-        $groupedOrders = $orders->groupBy('shop_id')->map(function ($shopOrders) {
-            return $shopOrders->groupBy('seller_id')->map(function ($sellerOrders) {
-                $mergedOrders = [];
-                foreach ($sellerOrders as $order) {
-                    $key = $order->product_id;
-                    if (!isset($mergedOrders[$key])) {
-                        $mergedOrders[$key] = [
-                            'order_id' => [],
-                            'product_id' => $order->product_id,
-                            'name' => $order->product->name,
-                            'quantity' => 0,
-                            'price' => $order->product->price,
-                            'total_price' => 0,
-                            'created_at' => null,
-                            'updated_at' => null,
-                        ];
-                    }
-                    $mergedOrders[$key]['order_id'][] = $order->id;
-                    $mergedOrders[$key]['quantity'] += $order->quantity;
-                    $mergedOrders[$key]['total_price'] += $order->price;
-                    $mergedOrders[$key]['created_at'] = $order->created_at;
-                    $mergedOrders[$key]['updated_at'] = $order->updated_at;
+    
+        $groupedOrders = $orders->groupBy('seller_id')->map(function ($sellerOrders) {
+            $mergedOrders = [];
+            foreach ($sellerOrders as $order) {
+                $productId = $order->product_id;
+                if (!isset($mergedOrders[$productId])) {
+                    $mergedOrders[$productId] = [
+                        'product_id' => $order->product_id,
+                        'name' => $order->product->name,
+                        'quantity' => 0,
+                        'price' => $order->product->price,
+                        'total_price' => 0,
+                        'created_at' => null,
+                        'updated_at' => null,
+                    ];
                 }
-                return [
-                    'seller_id' => $sellerOrders->first()->seller_id,
-                    'seller_name' => $sellerOrders->first()->seller->firstname,
-                    'total_price' => $sellerOrders->sum('price'),
-                    'products' => array_values($mergedOrders),
-                ];
-            });
+                $mergedOrders[$productId]['quantity'] += $order->quantity;
+                $mergedOrders[$productId]['total_price'] += $order->price; // Use 'total_price' instead of 'price'
+                $mergedOrders[$productId]['created_at'] = $order->created_at;
+                $mergedOrders[$productId]['updated_at'] = $order->updated_at;
+            }
+            return [
+                'seller_id' => $sellerOrders->first()->seller_id,
+                'seller_name' => $sellerOrders->first()->seller->firstname,
+                'total_price' => $sellerOrders->sum('price'), // Use 'total_price' instead of 'price'
+                'products' => array_values($mergedOrders),
+            ];
         });
-
+        
+        $groupedOrders = $groupedOrders->toArray();
+        
+        $finalGroupedOrders = collect($groupedOrders)->groupBy('seller_id')->map(function ($sellerGroup) {
+            $sellerData = [
+                'seller_id' => $sellerGroup->first()['seller_id'],
+                'seller_name' => $sellerGroup->first()['seller_name'],
+                'total_price' => $sellerGroup->sum('total_price'),
+                'products' => [],
+            ];
+        
+            foreach ($sellerGroup as $sellerOrder) {
+                $sellerData['products'] = array_merge($sellerData['products'], $sellerOrder['products']);
+            }
+        
+            return $sellerData;
+        })->values()->toArray();
+        
+        $perPage = $request->per_page ?? 20;
         $paginatedOrders = new \Illuminate\Pagination\LengthAwarePaginator(
-            $groupedOrders->collapse()->values()->forPage($request->page ?? 1, getPaginate()),
-            $groupedOrders->collapse()->count(),
-            getPaginate(),
+            collect($finalGroupedOrders)->forPage($request->page ?? 1, $perPage),
+            count($finalGroupedOrders),
+            $perPage,
             $request->page ?? 1
         );
-
+        
         return response()->json(['orders' => $paginatedOrders], 200);
-    }
 
+    }
 
 
     public function viewOrderWithDealerForRam(Request $request, $ramId)
     {
         $date = $request->date;
-
-        $orders = Order::with(['product', 'shop', 'dealer'])
+    
+        $orders = Order::with(['product', 'dealer'])
             ->where('ram_id', $ramId)
             ->whereDate('created_at', $date)
             ->where('status', 0)
             ->get();
-
-        $groupedOrders = $orders->groupBy('shop_id')->map(function ($shopOrders) {
-            $totalPrice = $shopOrders->sum('price');
-            $products = $shopOrders->map(function ($order) {
-                return [
-                    'order_id' => $order->id,
-                    'product_id' => $order->product_id,
-                    'name' => $order->product->name,
-                    'quantity' => $order->quantity,
-                    'price' => $order->product->price,
-                    'total_price' => $order->price,
-                    'created_at' => $order->created_at,
-                    'updated_at' => $order->updated_at,
-                ];
-            });
-
+    
+        $groupedOrders = $orders->groupBy('dealer_id')->map(function ($sellerOrders) {
+            $mergedOrders = [];
+            foreach ($sellerOrders as $order) {
+                $productId = $order->product_id;
+                if (!isset($mergedOrders[$productId])) {
+                    $mergedOrders[$productId] = [
+                        'product_id' => $order->product_id,
+                        'name' => $order->product->name,
+                        'quantity' => 0,
+                        'price' => $order->product->price,
+                        'total_price' => 0,
+                        'created_at' => null,
+                        'updated_at' => null,
+                    ];
+                }
+                $mergedOrders[$productId]['quantity'] += $order->quantity;
+                $mergedOrders[$productId]['total_price'] += $order->price; // Use 'total_price' instead of 'price'
+                $mergedOrders[$productId]['created_at'] = $order->created_at;
+                $mergedOrders[$productId]['updated_at'] = $order->updated_at;
+            }
             return [
-                'dealer_name' => $shopOrders->first()->dealer->firstname,
-                'total_price' => $totalPrice,
-                'products' => $products,
+                'dealer_id' => $sellerOrders->first()->dealer_id,
+                'dealer_name' => $sellerOrders->first()->dealer->firstname,
+                'total_price' => $sellerOrders->sum('price'), // Use 'total_price' instead of 'price'
+                'products' => array_values($mergedOrders),
             ];
         });
-
+        
+        $groupedOrders = $groupedOrders->toArray();
+        
+        $finalGroupedOrders = collect($groupedOrders)->groupBy('dealer_id')->map(function ($sellerGroup) {
+            $sellerData = [
+                'dealer_id' => $sellerGroup->first()['dealer_id'],
+                'dealer_name' => $sellerGroup->first()['dealer_name'],
+                'total_price' => $sellerGroup->sum('total_price'),
+                'products' => [],
+            ];
+        
+            foreach ($sellerGroup as $sellerOrder) {
+                $sellerData['products'] = array_merge($sellerData['products'], $sellerOrder['products']);
+            }
+        
+            return $sellerData;
+        })->values()->toArray();
+        
+        $perPage = $request->per_page ?? 20;
         $paginatedOrders = new \Illuminate\Pagination\LengthAwarePaginator(
-            $groupedOrders->values()->forPage($request->page ?? 1, getPaginate()),
-            $groupedOrders->count(),
-            getPaginate(),
+            collect($finalGroupedOrders)->forPage($request->page ?? 1, $perPage),
+            count($finalGroupedOrders),
+            $perPage,
             $request->page ?? 1
         );
-
-        return response()->json(['shops' => $paginatedOrders], 200);
+        
+        return response()->json(['orders' => $paginatedOrders], 200);
     }
 
     public function viewOrderWithSellerForRam(Request $request, $ramId)
     {
         $date = $request->date;
-
-        $orders = Order::with(['product', 'shop', 'seller'])
+    
+        // Fetch orders with eager loading of product and seller relationships
+        $orders = Order::with(['product', 'seller'])
             ->where('ram_id', $ramId)
             ->whereDate('created_at', $date)
             ->where('status', 0)
             ->get();
-
-        $groupedOrders = $orders->groupBy('shop_id')->map(function ($shopOrders) {
-            return $shopOrders->groupBy('seller_id')->map(function ($sellerOrders) {
-                $totalPrice = $sellerOrders->sum('price');
-                $products = $sellerOrders->map(function ($order) {
-                    return [
-                        'order_id' => $order->id,
+    
+        // Group orders by seller_id
+        $groupedOrders = $orders->groupBy('seller_id')->map(function ($sellerOrders) {
+            $mergedOrders = [];
+            foreach ($sellerOrders as $order) {
+                $productId = $order->product_id;
+                if (!isset($mergedOrders[$productId])) {
+                    $mergedOrders[$productId] = [
                         'product_id' => $order->product_id,
                         'name' => $order->product->name,
-                        'quantity' => $order->quantity,
+                        'quantity' => 0,
                         'price' => $order->product->price,
-                        'total_price' => $order->price,
-                        'created_at' => $order->created_at,
-                        'updated_at' => $order->updated_at,
+                        'total_price' => 0,
+                        'created_at' => null,
+                        'updated_at' => null,
                     ];
-                });
-                return [
-                    'seller_id' => $sellerOrders->first()->seller_id,
-                    'seller_name' => $sellerOrders->first()->seller->firstname,
-                    'total_price' => $totalPrice,
-                    'products' => $products,
-                ];
-            });
+                }
+                $mergedOrders[$productId]['quantity'] += $order->quantity;
+                $mergedOrders[$productId]['total_price'] += $order->price; // Use 'total_price' instead of 'price'
+                $mergedOrders[$productId]['created_at'] = $order->created_at;
+                $mergedOrders[$productId]['updated_at'] = $order->updated_at;
+            }
+            return [
+                'seller_id' => $sellerOrders->first()->seller_id,
+                'seller_name' => $sellerOrders->first()->seller->firstname,
+                'total_price' => $sellerOrders->sum('price'), // Use 'total_price' instead of 'price'
+                'products' => array_values($mergedOrders),
+            ];
         });
-
+        
+        // Convert the grouped orders to array
+        $groupedOrders = $groupedOrders->toArray();
+        
+        // Group the grouped orders by seller_id
+        $finalGroupedOrders = collect($groupedOrders)->groupBy('seller_id')->map(function ($sellerGroup) {
+            $sellerData = [
+                'seller_id' => $sellerGroup->first()['seller_id'],
+                'seller_name' => $sellerGroup->first()['seller_name'],
+                'total_price' => $sellerGroup->sum('total_price'),
+                'products' => [],
+            ];
+        
+            foreach ($sellerGroup as $sellerOrder) {
+                $sellerData['products'] = array_merge($sellerData['products'], $sellerOrder['products']);
+            }
+        
+            return $sellerData;
+        })->values()->toArray();
+        
+        // Paginate the final grouped orders
+        $perPage = $request->per_page ?? 20;
         $paginatedOrders = new \Illuminate\Pagination\LengthAwarePaginator(
-            $groupedOrders->collapse()->values()->forPage($request->page ?? 1, getPaginate()),
-            $groupedOrders->collapse()->count(),
-            getPaginate(),
+            collect($finalGroupedOrders)->forPage($request->page ?? 1, $perPage),
+            count($finalGroupedOrders),
+            $perPage,
             $request->page ?? 1
         );
-
+        
         return response()->json(['orders' => $paginatedOrders], 200);
     }
 

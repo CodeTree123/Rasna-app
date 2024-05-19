@@ -1,0 +1,4 @@
+[09-May-2024 23:01:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home1/rasnapharmabd/public_html/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home1/rasnapharmabd/public_html/config/database.php on line 18

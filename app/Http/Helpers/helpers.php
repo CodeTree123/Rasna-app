@@ -131,7 +131,7 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->send();
 }
 
-function getPaginate($paginate = 20)
+function getPaginate($paginate = 10)
 {
     return $paginate;
 }
